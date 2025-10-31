@@ -39,6 +39,7 @@ class WorkDirQuaternion:
 
 #endregion
 
+
 @dataclass
 class WorkDirSplinePointData:
     position: WorkDirVector3

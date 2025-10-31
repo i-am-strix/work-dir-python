@@ -11,6 +11,7 @@ bl_info = {
 from . export.wk_export import WorkDirExport
 from . export.wk_export import menu_func_export
 from . ui.wk_utility_panel import ObjectSelectPanel
+
 import bpy
 
 if "bpy" in locals():
