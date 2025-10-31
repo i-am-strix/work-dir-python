@@ -1,6 +1,6 @@
 ﻿bl_info = {
     "name": "Horizons Workdir System",
-    "blender": (2, 80, 0),
+    "blender": (4, 3, 0),
     "category": "Tools",
     "description": "WorkDir Level pipeline for Sonic Horizons",
     "author": "strix",
