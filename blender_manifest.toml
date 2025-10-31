@@ -1,0 +1,14 @@
+schema_version = "1.0.0"
+
+id = "sonic_horizons_workdir"
+version = "2.0.0"
+name = "WorkDir"
+tagline = "WorkDir environment for Sonic Horizons"
+maintainer = "strix"
+type = "add-on"
+
+tags = ["Import-Export"]
+
+blender_version_min = "4.3.0"
+
+license = ["0BSD"]
