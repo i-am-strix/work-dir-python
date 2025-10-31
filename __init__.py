@@ -1,14 +1,4 @@
-﻿
-bl_info = {
-    "name": "Horizons Workdir System",
-    "blender": (2, 80, 0),
-    "category": "Tools",
-    "description": "WorkDir Level pipeline for Sonic Horizons",
-    "author": "strix",
-    "version": (2, 0, 0),
-}
-
-from . export.wk_export import WorkDirExport
+﻿from . export.wk_export import WorkDirExport
 from . export.wk_export import menu_func_export
 from . ui.wk_utility_panel import ObjectSelectPanel
 
