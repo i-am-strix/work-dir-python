@@ -26,6 +26,12 @@ def export_spline(self, context, filepath):
         if not obj or obj.type != 'CURVE':
             continue
 
+        extrusion = obj.data.extrude
+        bevel = obj.data.bevel_depth
+
+        obj.data.bevel_depth = 0
+        obj.data.extrude = 0
+
         depsgraph = bpy.context.evaluated_depsgraph_get()
         eval_obj = obj.evaluated_get(depsgraph)
         curve_eval = eval_obj.to_mesh()
@@ -42,6 +48,7 @@ def export_spline(self, context, filepath):
 
         output_data = WorkDirSplineObject(obj.name,
                                           "0",
+                                          spline.use_cyclic_u,
                                           WorkDirVector3.from_bvector(obj.location),
                                           obj.rotation_mode,
                                           WorkDirQuaternion(output_quat.x, -output_quat.z, output_quat.y, output_quat.w),
@@ -60,6 +67,9 @@ def export_spline(self, context, filepath):
 
         nurb_data.splines.append(output_data)
 
+        obj.data.bevel_depth = bevel
+        obj.data.extrude = extrusion
+
         # curve = obj.data
         # self.report({'INFO'}, "curve type: {0}".format(curve.splines[0].type))
 
@@ -72,7 +82,6 @@ def export_spline(self, context, filepath):
 
     # man python sucks
     nurb_js = json.dumps(nurb_data, indent=1, cls=WorkDirSplineOutputEncoder)
-    self.report({'INFO'}, "json output data: {0}".format(nurb_js))
 
     with open(filepath, 'w') as f:
         f.write(nurb_js)

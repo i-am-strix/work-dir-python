@@ -38,6 +38,7 @@ class WorkDirExport(bpy.types.Operator, ExportHelper):
 
             shutil.move(archive, self.filepath)
 
+        self.report({'INFO'}, "Exported stage successfully")
         return {'FINISHED'}
 
     def invoke(self, context, event):

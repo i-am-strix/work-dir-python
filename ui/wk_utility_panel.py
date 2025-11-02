@@ -41,6 +41,7 @@ class ObjectSelectPanel(bpy.types.Panel):
 
         box.label(text="OBJECT SIGNATURE")
         box.prop(context.object, "wk_obj_uuid", text="Object UUID (DO NOT MODIFY)")
+        box.operator("find.wk_get_last_id", text="Get Last Unique ID")
 
         for key in context.object.keys():
             if not key.startswith('wk_'):
@@ -58,6 +59,12 @@ class ObjectSelectPanel(bpy.types.Panel):
     bpy.types.Object.wk_terrain_is_jump_thru = BoolProperty(default = False)
     bpy.types.Object.wk_terrain_is_wall_run = BoolProperty(default = False)
 
+    bpy.types.Object.wk_terrain_is_moving_platform = BoolProperty(default = False)
+    bpy.types.Object.wk_terrain_moving_path = PointerProperty(type = bpy.types.Object, name = "Moving Path")
+    bpy.types.Object.wk_terrain_moving_speed = FloatProperty(default = 1.0, name = "Movement Speed")
+    bpy.types.Object.wk_terrain_start_time = FloatProperty(default = 0, name = "Start Time along Path", min = 0.0, max = 1.0)
+    bpy.types.Object.wk_terrain_moving_use_linear = BoolProperty(default = False)
+
     def draw_terrain_sig(self, context, box):
         if not context.object:
             return
@@ -66,6 +73,14 @@ class ObjectSelectPanel(bpy.types.Panel):
 
         box.prop(context.object, "wk_terrain_is_jump_thru", text="Is Jump Thru")
         box.prop(context.object, "wk_terrain_is_wall_run", text="Wall Run Surface")
+
+        box.prop(context.object, "wk_terrain_is_moving_platform", text="Is Moving Platform")
+
+        if context.object.wk_terrain_is_moving_platform is True:
+            box.prop(context.object, "wk_terrain_moving_path", text = "Moving Path")
+            box.prop(context.object, "wk_terrain_moving_speed", text = "Movement Speed")
+            box.prop(context.object, "wk_terrain_start_time", text = "Start Time along Path")
+            box.prop(context.object, "wk_terrain_moving_use_linear", text = "Use Linear Movement?")
 
     #endregion
 
@@ -236,8 +251,28 @@ class AddObjectSignature(bpy.types.Operator):
                 case 4:
                     obj["WorkDirObjSignature"] = "SPAWN_POINT"
 
-        self.report({"INFO"}, "did something")
         return {'FINISHED'}
 
 bpy.utils.register_class(AddObjectSignature)
+
+class GetLastUniqueID(bpy.types.Operator):
+    bl_idname = "find.wk_get_last_id"
+    bl_label = "Get Last Unique ID"
+
+    @classmethod
+    def poll(cls, context):
+        return context.active_object is not None
+    def execute(self, context):
+        highest_id = 0
+
+        for obj in context.scene.objects:
+            if obj.wk_obj_uuid > highest_id:
+                highest_id = obj.wk_obj_uuid
+
+        bpy.context.selected_objects[0].wk_obj_uuid = highest_id
+
+        return {'FINISHED'}
+
+bpy.utils.register_class(GetLastUniqueID)
+
 

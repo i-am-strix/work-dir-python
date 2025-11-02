@@ -7,5 +7,4 @@ def export_gltf(self, context, target_path):
         export_extras=True,
     )
 
-    self.report({'INFO'}, "did it work?")
     return {'FINISHED'}

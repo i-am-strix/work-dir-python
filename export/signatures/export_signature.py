@@ -2,6 +2,7 @@
 import json
 from typing import Generic, TypeVar, List, Dict
 
+from ... data_types import WorkDirVector3
 from .signature import WorkDirSignatureManager, SignatureComplianceOutputEncoder, WorkDirSignatureCompliantObject
 
 sig_data = WorkDirSignatureManager([])
@@ -19,7 +20,7 @@ def export_signature(self, context, target_path):
             name = obj.name,
             uuid = int(attempt_get(obj, "obj_uuid")) if attempt_get(obj, "obj_uuid") is not "" else 0,
             signature = attempt_get(obj, "WorkDirObjSignature"),
-            active = obj.visible_get(),
+            active = not obj.hide_render,
             spline_type = 0,
             custom_properties = {}
         )
@@ -33,6 +34,10 @@ def export_signature(self, context, target_path):
 
             print(key, value, value_kind)
 
+            if value_kind == "IDPropertyArray":
+                output_sig_data.custom_properties[key] = str(WorkDirVector3(value[0], value[1], value[2]))
+                continue
+
             if not value_kind == "Object": # if its not a pointer do the default shit
                 output_sig_data.custom_properties[key] = str(value)
             else:
@@ -45,5 +50,3 @@ def export_signature(self, context, target_path):
 
     with open(target_path, 'w') as f:
         f.write(sig_js)
-
-    self.report({'INFO'}, "exported signature to " + target_path)

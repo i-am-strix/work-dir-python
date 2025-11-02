@@ -1,9 +1,5 @@
 ﻿import bpy
 
-"""
-bo : bpy_types.Object
-"""
-
 def update_dependencies(ob):
     def update_exp(d):
         # https://blender.stackexchange.com/questions/118350/how-to-update-the-dependencies-of-a-driver-via-python-script

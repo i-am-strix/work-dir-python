@@ -4,7 +4,6 @@ from .. util.driver_upd_dep import update_dependencies
 def add_ring_spline(self, context):
     obj = context.object
     if obj is None:
-        self.report({'ERROR'}, "No active object.")
         return {'CANCELLED'}
 
     # --- Create or reuse node group ---

@@ -51,6 +51,7 @@ class WorkDirSplinePointData:
 class WorkDirSplineObject:
     name: str
     object_id: str
+    cyclic: bool
     position: WorkDirVector3
     rotation_type: int # 0 is quaternion rotation, 1 is euler rotation, anything else is negligible
     quat_rotation: WorkDirQuaternion
@@ -59,9 +60,10 @@ class WorkDirSplineObject:
     path_type: str
     points: list[WorkDirSplinePointData]
 
-    def __init(self, name, object_id, position, rotation_type, quat_rotation, euler_rotation, scale, path_type, points):
+    def __init__(self, name, object_id, cyclic, position, rotation_type, quat_rotation, euler_rotation, scale, path_type, points):
         self.name = name
         self.object_id = object_id
+        self.cyclic = cyclic
         self.position = position
         self.rotation_type = rotation_type
         self.quat_rotation = quat_rotation

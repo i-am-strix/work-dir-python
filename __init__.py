@@ -1,4 +1,14 @@
-﻿from . export.wk_export import WorkDirExport
+﻿"""
+Hi there, this is the WorkDir Blender source code
+
+If you're snooping around here, I want you to know that I am, in fact, a HORRIBLE
+Python developer, and that a lot of this code probably doesn't adhere to Python standards
+or is even good
+
+but it works in practice so like idgaf
+"""
+
+from . export.wk_export import WorkDirExport
 from . export.wk_export import menu_func_export
 from . ui.wk_utility_panel import ObjectSelectPanel
 
