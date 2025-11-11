@@ -42,7 +42,7 @@ class WorkDirExport(bpy.types.Operator, ExportHelper):
 
         shutil.move(archive, self.filepath)
 
-        os.rmdir(parent_path.joinpath("export"))
+        shutil.rmtree(parent_path.joinpath("export"), ignore_errors=True)
 
         self.report({'INFO'}, "Exported stage successfully")
         return {'FINISHED'}

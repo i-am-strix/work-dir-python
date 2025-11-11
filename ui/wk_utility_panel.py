@@ -53,7 +53,7 @@ class ObjectSelectPanel(bpy.types.Panel):
         if not context.object:
             return
 
-        box.label(text="OBJECT SIGNATURE")
+        box.label(text="OBJECT SETTINGS")
         box.prop(context.object, "wk_obj_uuid", text="Object UUID (DO NOT MODIFY)")
         box.operator("find.wk_get_last_id", text="Get Last Unique ID")
 
@@ -77,7 +77,7 @@ class ObjectSelectPanel(bpy.types.Panel):
         if not context.object:
             return
 
-        box.label(text="TERRAIN SIGNATURE")
+        box.label(text="TERRAIN SETTINGS")
 
         box.prop(context.object, "wk_terrain_is_jump_thru", text="Is Jump Thru")
         box.prop(context.object, "wk_terrain_is_wall_run", text="Wall Run Surface")
@@ -107,7 +107,7 @@ class ObjectSelectPanel(bpy.types.Panel):
     bpy.types.Object.wk_spline_type = EnumProperty(items=[
         ('0', 'Rail', ''),
         ('1', 'Zipline', ''),
-        ('2', '2D Spline', ''),
+        ('2', 'Path', ''),
         ('3', 'Ring Spline', ''),], update=update_spline_type)
 
     bpy.types.Object.wk_spline_rail_start_terminal = BoolProperty(default = True)
@@ -118,7 +118,7 @@ class ObjectSelectPanel(bpy.types.Panel):
         if not context.object:
             return
 
-        box.label(text="SPLINE SIGNATURE")
+        box.label(text="SPLINE SETTINGS")
 
         box.prop(context.object, "wk_spline_type", text="Spline Type")
         if context.object.wk_spline_type == '0':
@@ -151,7 +151,7 @@ class ObjectSelectPanel(bpy.types.Panel):
         if not context.object:
             return
 
-        box.label(text="TRIGGER SIGNATURE")
+        box.label(text="TRIGGER SETTINGS")
 
         box.prop(context.object, "wk_trigger_type", text="Trigger Type")
         if context.object.wk_trigger_type == '1':
@@ -202,6 +202,8 @@ class ObjectSelectPanel(bpy.types.Panel):
 
         _clear_op = box.operator("workdir.verify_sig", text="Remove Signatures")
         _clear_op.clear_sig = True
+
+        box.label(text = "Defined as: {0}".format(bpy.context.selected_objects[0]["WorkDirObjSignature"] if bpy.context.selected_objects[0]["WorkDirObjSignature"] is not None else "NONE"))
 
         box = layout.box()
         box.label(text = "Common Settings")
