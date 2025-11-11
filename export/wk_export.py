@@ -13,6 +13,7 @@ from .wk_export_gltf import export_gltf
 from .wk_export_splines import export_spline
 from .signatures.wk_signature import analyze_signatures
 from .signatures.export_signature import export_signature
+from .wk_export_verify_null import verify_null
 
 class WorkDirExport(bpy.types.Operator, ExportHelper):
     bl_idname = "export.horizons_stage"
@@ -24,19 +25,24 @@ class WorkDirExport(bpy.types.Operator, ExportHelper):
     )
     filepath: bpy.props.StringProperty(subtype="FILE_PATH")
     def execute(self, context):
-        with tempfile.TemporaryDirectory() as work_folder:
-            analyze_signatures(self, context)
-            export_gltf(self, context, work_folder + "/geometry.glb")
-            export_spline(self, context, work_folder + "/splines.cvd")
-            export_signature(self, context, work_folder + "/signatures.sig")
+        parent_path = Path(self.filepath).parent.absolute()
 
-            # archive the stage and write to target location
+        os.mkdir(parent_path.joinpath("export"))
+        work_folder = parent_path.joinpath("export").absolute()
 
-            archive = shutil.make_archive(Path(self.filepath).stem, "zip", work_folder)
-            if os.path.isfile(self.filepath):
-                os.remove(self.filepath)
+        export_gltf(self, context, str(work_folder) + "/geometry.glb")
+        export_spline(self, context, str(work_folder) + "/splines.cvd")
+        export_signature(self, context, str(work_folder) + "/signatures.sig")
 
-            shutil.move(archive, self.filepath)
+        # archive the stage and write to target location
+
+        archive = shutil.make_archive(Path(self.filepath).stem, "zip", str(work_folder))
+        if os.path.isfile(self.filepath):
+            os.remove(self.filepath)
+
+        shutil.move(archive, self.filepath)
+
+        os.rmdir(parent_path.joinpath("export"))
 
         self.report({'INFO'}, "Exported stage successfully")
         return {'FINISHED'}

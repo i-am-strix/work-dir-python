@@ -5,6 +5,7 @@ from bpy.props import IntProperty, BoolProperty, EnumProperty, PointerProperty, 
 from enum import Enum
 
 from .. nodes.op_add_ring_spline import add_ring_spline
+from .. migration.wk_migrator_bootstrapper import MigrateToWK2
 
 
 def attempt_get(obj, key):
@@ -31,6 +32,19 @@ class ObjectSelectPanel(bpy.types.Panel):
     bpy.types.Object.wk_cmn_disable_collision = BoolProperty(default = False)
     bpy.types.Object.wk_cmn_is_hidden = BoolProperty(default = False)
 
+    def get_signature(self):
+        return self.get("WorkDirObjSignature", "")
+
+    def set_signature(self, value):
+        self["WorkDirObjSignature"] = value
+
+    bpy.types.Object.WorkDirObjSignature = bpy.props.StringProperty(
+        name="Object Type",
+        options={'HIDDEN'},
+        get=get_signature,
+        set=set_signature
+    )
+
 
     #region Object Sig
     bpy.types.Object.wk_obj_uuid = IntProperty(default = 0)
@@ -42,12 +56,6 @@ class ObjectSelectPanel(bpy.types.Panel):
         box.label(text="OBJECT SIGNATURE")
         box.prop(context.object, "wk_obj_uuid", text="Object UUID (DO NOT MODIFY)")
         box.operator("find.wk_get_last_id", text="Get Last Unique ID")
-
-        for key in context.object.keys():
-            if not key.startswith('wk_'):
-                if key == "WorkDirObjSignature":
-                    continue
-                box.prop(context.object, key, text=key)
 
     #endregion
 
@@ -170,23 +178,23 @@ class ObjectSelectPanel(bpy.types.Panel):
         box.label(text="Define how the game interprets this object")
         box.label(text="If the object doesn't have a signature, the game won't recognise it!", icon="ERROR")
 
-        _obj_op = box.operator("workdir.verify_sig", text="Add Object Signature")
+        _obj_op = box.operator("workdir.verify_sig", text="Define as Object")
         _obj_op.sig_type = 0
         _obj_op.clear_sig = False
 
-        _terr_op = box.operator("workdir.verify_sig", text="Add Terrain Signature")
+        _terr_op = box.operator("workdir.verify_sig", text="Define as Terrain")
         _terr_op.sig_type = 1
         _terr_op.clear_sig = False
 
-        _spline_op = box.operator("workdir.verify_sig", text="Add Spline Signature")
+        _spline_op = box.operator("workdir.verify_sig", text="Define as Spline")
         _spline_op.sig_type = 2
         _spline_op.clear_sig = False
 
-        _trigger_op = box.operator("workdir.verify_sig", text="Add Trigger Signature")
+        _trigger_op = box.operator("workdir.verify_sig", text="Define as Trigger")
         _trigger_op.sig_type = 3
         _trigger_op.clear_sig = False
 
-        _spawn_op = box.operator("workdir.verify_sig", text="Add Spawn Point Signature")
+        _spawn_op = box.operator("workdir.verify_sig", text="Define as Spawn Point")
         _spawn_op.sig_type = 4
         _spawn_op.clear_sig = False
 
@@ -203,6 +211,9 @@ class ObjectSelectPanel(bpy.types.Panel):
         box = layout.box()
 
         if bpy.context.selected_objects.__len__() == 1:
+            if bpy.context.selected_objects[0].get('WorkDirObjSignature') is None:
+                bpy.context.selected_objects[0]["WorkDirObjSignature"] = "TERRAIN"
+
             if bpy.context.selected_objects[0]["WorkDirObjSignature"] == "TERRAIN":
                 self.draw_terrain_sig(context, box)
 
@@ -214,6 +225,8 @@ class ObjectSelectPanel(bpy.types.Panel):
 
             elif bpy.context.selected_objects[0]["WorkDirObjSignature"] == "TRIGGER":
                 self.draw_trigger_sig(context, box)
+
+        box.operator("workdir.migration_window", text = "Migrate Stage to WorkDir v2")
 
 def possible_items(context):
     return ["object", "terrain", "path", "trigger"]
@@ -236,20 +249,20 @@ class AddObjectSignature(bpy.types.Operator):
 
         for obj in selected_objects:
             if self.clear_sig is True:
-                obj["WorkDirObjSignature"] = ""
+                obj.WorkDirObjSignature = ""
                 break
 
             match self.sig_type:
                 case 0:
-                    obj["WorkDirObjSignature"] = "OBJECT"
+                    obj.WorkDirObjSignature = "OBJECT"
                 case 1:
-                    obj["WorkDirObjSignature"] = "TERRAIN"
+                    obj.WorkDirObjSignature = "TERRAIN"
                 case 2:
-                    obj["WorkDirObjSignature"] = "SPLINE"
+                    obj.WorkDirObjSignature = "SPLINE"
                 case 3:
-                    obj["WorkDirObjSignature"] = "TRIGGER"
+                    obj.WorkDirObjSignature = "TRIGGER"
                 case 4:
-                    obj["WorkDirObjSignature"] = "SPAWN_POINT"
+                    obj.WorkDirObjSignature = "SPAWN_POINT"
 
         return {'FINISHED'}
 
